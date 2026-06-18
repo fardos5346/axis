@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Coordinate System / מערכת הצירים / نظام الإحداثيات / Система координат</title>
+    <style>
+        :root {
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --primary-color: #3498db;
+            --success-color: #2ecc71;
+            --error-color: #e74c3c;
+            --border-radius: 8px;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            transition: all 0.3s ease;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .lang-switcher {
+            margin-top: 10px;
+        }
+
+        .lang-btn {
+            background: white;
+            color: var(--primary-color);
+            border: none;
+            padding: 8px 15px;
+            margin: 5px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        .lang-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 20px;
+        }
+
+        section {
+            background: var(--card-bg);
+            padding: 25px;
+            margin-bottom: 25px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            color: var(--primary-color);
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .quadrant-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 20px 0;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .quadrant {
+            padding: 20px;
+            text-align: center;
+            font-weight: bold;
+            border-radius: var(--border-radius);
+            border: 2px dashed #ccc;
+        }
+
+        .q1 { background-color: #e8f8f5; border-color: #2ecc71; }
+        .q2 { background-color: #fef9e7; border-color: #f1c40f; }
+        .q3 { background-color: #feadad; border-color: #e74c3c; }
+        .q4 { background-color: #ebf5fb; border-color: #3498db; }
+
+        .quiz-container {
+            margin-top: 20px;
+        }
+
+        .question-card {
+            background: #fafafa;
+            border: 1px solid #e0e0e0;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: var(--border-radius);
+        }
+
+        .options {
+            margin-top: 10px;
+        }
+
+        .option-label {
+            display: block;
+            margin: 8px 0;
+            cursor: pointer;
+        }
+
+        .btn-check {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            cursor: pointer;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+
+        .btn-check:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        .feedback {
+            margin-top: 10px;
+            font-weight: bold;
+            padding: 8px;
+            border-radius: 4px;
+        }
+
+        .correct { background-color: #e8f8f5; color: var(--success-color); border-left: 4px solid var(--success-color); }
+        .wrong { background-color: #fdedec; color: var(--error-color); border-left: 4px solid var(--error-color); }
+        
+        [dir="rtl"] .correct { border-left: none; border-right: 4px solid var(--success-color); }
+        [dir="rtl"] .wrong { border-left: none; border-right: 4px solid var(--error-color); }
+
+        .explanation {
+            font-weight: normal;
+            font-size: 0.95rem;
+            color: #555;
+            margin-top: 5px;
+        }
+
+        .geo-diagram {
+            margin: 15px 0;
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 5px;
+            max-width: 320px;
+            border-radius: 4px;
+        }
+
+        #score-board {
+            position: sticky;
+            top: 10px;
+            background: var(--primary-color);
+            color: white;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            z-index: 1000;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+
+        [dir="rtl"] .quadrant-grid {
+            direction: ltr;
+        }
+        [dir="rtl"] {
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1 id="main-title">The X and Y Axes</h1>
+    <div class="lang-switcher">
+        <button class="lang-btn" onclick="setLanguage('en')">English</button>
+        <button class="lang-btn" onclick="setLanguage('he')">עברית</button>
+        <button class="lang-btn" onclick="setLanguage('ar')">العربية</button>
+        <button class="lang-btn" onclick="setLanguage('ru')">Русский</button>
+    </div>
+</header>
+
+<div class="container">
+    <div id="score-board">
+        <span id="score-text">Score: 0 / 20</span>
+    </div>
+
+    <section>
+        <h2 id="title-why-need">Why do we need it?</h2>
+        <p id="content-why-need">The X and Y axes create a coordinate system that allows us to pinpoint any exact location on a flat surface using just two numbers. Without it, describing positions in maps, graphics, and data visualization would be incredibly difficult.</p>
+    </section>
+
+    <section>
+        <h2 id="title-quadrants">Understanding the 4 Quadrants</h2>
+        <div class="quadrant-grid">
+            <div class="quadrant q2">
+                <div class="quad-num">Quadrant 2 (Q2)</div>
+                <div class="quad-signs">(- , +)</div>
+                <small style="font-weight:normal;" class="quad-desc">Negative X / Positive Y</small>
+            </div>
+            <div class="quadrant q1">
+                <div class="quad-num">Quadrant 1 (Q1)</div>
+                <div class="quad-signs">(+ , +)</div>
+                <small style="font-weight:normal;" class="quad-desc">All Positive</small>
+            </div>
+            <div class="quadrant q3">
+                <div class="quad-num">Quadrant 3 (Q3)</div>
+                <div class="quad-signs">(- , -)</div>
+                <small style="font-weight:normal;" class="quad-desc">All Negative Mix</small>
+            </div>
+            <div class="quadrant q4">
+                <div class="quad-num">Quadrant 4 (Q4)</div>
+                <div class="quad-signs">(+ , -)</div>
+                <small style="font-weight:normal;" class="quad-desc">Positive X / Negative Y</small>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2 id="title-why-learn">Why do we learn it?</h2>
+        <p id="content-why-learn">Learning coordinates is the foundation for algebra, geometry, and data science. It helps us understand graphs, design video games (positioning objects on a screen), navigate using GPS, and read maps efficiently.</p>
+    </section>
+
+    <section>
+        <h2 id="title-history">A Little History</h2>
+        <p id="content-history">This system is known as the Cartesian coordinate system, named after the French philosopher and mathematician René Descartes, who introduced it in the 17th century. Legend says he came up with the idea while watching a fly crawl across his ceiling, realizing he could describe its position using distances from the walls.</p>
+    </section>
+
+    <section>
+        <h2 id="title-quiz">Test Your Knowledge (20 Questions)</h2>
+        <div id="quiz" class="quiz-container"></div>
+    </section>
+</div>
+
+<script>
+    // SVGs for geometry questions
+    const svgRightTriangle = `
+    <div class="geo-diagram">
+        <svg viewBox="0 0 200 160" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+            <line x1="20" y1="130" x2="180" y2="130" stroke="#000" stroke-width="2"/>
+            <line x1="40" y1="20" x2="40" y2="150" stroke="#000" stroke-width="2"/>
+            <path d="M 40 130 L 140 130 L 140 40 Z" fill="#3498db" fill-opacity="0.3" stroke="#3498db" stroke-width="3"/>
+            <text x="180" y="125" font-size="12" font-weight="bold">X</text>
+            <text x="45" y="25" font-size="12" font-weight="bold">Y</text>
+            <circle cx="40" cy="130" r="4" fill="red"/> <text x="25" y="145" font-size="10">(0,0)</text>
+            <circle cx="140" cy="130" r="4" fill="red"/> <text x="135" y="145" font-size="10">(4,0)</text>
+            <circle cx="140" cy="40" r="4" fill="red"/> <text x="145" y="35" font-size="10">(4,3)</text>
+            <text x="85" y="125" font-size="11" fill="#333" font-weight="bold">Base = 4</text>
+            <text x="145" y="90" font-size="11" fill="#333" font-weight="bold">Height = 3</text>
+        </svg>
+    </div>`;
+
+    const svgObtuseTriangle = `
+    <div class="geo-diagram">
+        <svg viewBox="0 0 220 160" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+            <line x1="20" y1="130" x2="200" y2="130" stroke="#000" stroke-width="2"/>
+            <line x1="30" y1="20" x2="30" y2="150" stroke="#000" stroke-width="2"/>
+            <path d="M 70 130 L 150 130 L 190 30 Z" fill="#e67e22" fill-opacity="0.3" stroke="#e67e22" stroke-width="3"/>
+            <line x1="190" y1="30" x2="190" y2="130" stroke="#7f8c8d" stroke-dasharray="4" stroke-width="2"/>
+            <line x1="150" y1="130" x2="190" y2="130" stroke="#7f8c8d" stroke-dasharray="4" stroke-width="2"/>
+            <circle cx="70" cy="130" r="4" fill="red"/> <text x="55" y="145" font-size="10">(2,0)</text>
+            <circle cx="150" cy="130" r="4" fill="red"/> <text x="135" y="145" font-size="10">(6,0)</text>
+            <circle cx="190" cy="30" r="4" fill="red"/> <text x="180" y="25" font-size="10">(8,5)</text>
+            <text x="95" y="125" font-size="11" font-weight="bold">Base = 4</text>
+            <text x="195" y="85" font-size="11" fill="#7f8c8d" font-weight="bold">Height = 5</text>
+        </svg>
+    </div>`;
+
+    const translations = {
+        en: {
+            dir: "ltr", mainTitle: "The X and Y Axes", whyNeedTitle: "Why do we need it?",
+            whyNeedContent: "The X and Y axes create a coordinate system that allows us to pinpoint any exact location on a flat surface using just two numbers.",
+            quadrantsTitle: "Understanding the 4 Quadrants",
+            quads: [
+                { num: "Quadrant 2 (Q2)", desc: "Negative X / Positive Y" },
+                { num: "Quadrant 1 (Q1)", desc: "All Positive" },
+                { num: "Quadrant 3 (Q3)", desc: "All Negative Mix" },
+                { num: "Quadrant 4 (Q4)", desc: "Positive X / Negative Y" }
+            ],
+            whyLearnTitle: "Why do we learn it?", whyLearnContent: "Learning coordinates is the foundation for algebra, geometry, and maps.",
+            historyTitle: "A Little History", historyContent: "Invented by René Descartes in the 17th century.",
+            quizTitle: "Test Your Knowledge (20 Questions)", score: "Score", checkBtn: "Check Answer",
+            correct: "Correct! 🎉", wrong: "Incorrect. ❌",
+            questions: [
+                { q: "1. Which axis is horizontal?", o: ["X-axis", "Y-axis"], a: 0, exp: "The X-axis runs horizontally across the screen from left to right." },
+                { q: "2. Which axis is vertical?", o: ["X-axis", "Y-axis"], a: 1, exp: "The Y-axis runs vertically straight up and down." },
+                { q: "3. What is the intersection point (0,0) called?", o: ["Center", "Origin"], a: 1, exp: "The start point where the axes cross is defined as the 'Origin'." },
+                { q: "4. Who invented this system?", o: ["Isaac Newton", "René Descartes"], a: 1, exp: "René Descartes created this system, which is why it's called the 'Cartesian' system." },
+                { q: "5. In the coordinate (3, 5), what is the X value?", o: ["3", "5"], a: 0, exp: "An ordered pair always lists X first: (X, Y)." },
+                { q: "6. In the coordinate (4, 7), what is the Y value?", o: ["4", "7"], a: 1, exp: "An ordered pair always lists Y second: (X, Y)." },
+                { q: "7. Moving right on the X-axis means values become...", o: ["Positive", "Negative"], a: 0, exp: "Right of the origin represents increasing positive X values." },
+                { q: "8. Moving down on the Y-axis means values become...", o: ["Positive", "Negative"], a: 1, exp: "Below the origin represents decreasing negative Y values." },
+                { q: "9. How many quadrants are in a standard grid?", o: ["2", "4"], a: 1, exp: "The two crossing intersecting axes split the space into four individual quadrants." },
+                { q: "10. In Quadrant 1, both X and Y are...", o: ["Positive", "Negative"], a: 0, exp: "Quadrant 1 is the top-right box, where both values are positive." },
+                { q: "11. Where is the point (-3, 0) located?", o: ["On the X-axis", "On the Y-axis"], a: 0, exp: "Because the Y value is 0, the point sits exactly on the horizontal X-axis line." },
+                { q: "12. Where is the point (0, 5) located?", o: ["On the X-axis", "On the Y-axis"], a: 1, exp: "Because the X value is 0, the point sits exactly on the vertical Y-axis line." },
+                { q: "13. What is another name for the X-coordinate?", o: ["Abscissa", "Ordinate"], a: 0, exp: "Abscissa is the technical mathematical terminology used for the X-distance." },
+                { q: "14. What is another name for the Y-coordinate?", o: ["Abscissa", "Ordinate"], a: 1, exp: "Ordinate is the technical mathematical terminology used for the Y-distance." },
+                { q: "15. Which coordinate comes first in an ordered pair?", o: ["X", "Y"], a: 0, exp: "By absolute universal standard convention, X is always listed first: (X, Y)." },
+                { q: "16. In Quadrant 3 (Third Quarter), both values are...", o: ["Positive", "A mix of negative X and negative Y (-,-)"], a: 1, exp: "The third quadrant contains negative horizontal X values and negative vertical Y values." },
+                { q: "17. What technology relies heavily on coordinates?", o: ["GPS Mapping", "Audio Speakers"], a: 0, exp: "GPS tracking uses global latitude and longitude coordinate intersection points." },
+                { q: "18. What angle do the X and Y axes meet at?", o: ["45 degrees", "90 degrees"], a: 1, exp: "The axes are completely perpendicular, forming a clean 90-degree right angle." },
+                { q: "19. Calculate the right triangle area shown below.", o: ["6 square units", "12 square units"], a: 0, media: svgRightTriangle, exp: "Area = 0.5 × Base × Height. Here, Base = 4 (from 0 to 4) and Height = 3 (from 0 to 3). So, 0.5 × 4 × 3 = 6." },
+                { q: "20. Calculate the obtuse triangle area with outside height shown below.", o: ["10 square units", "20 square units"], a: 0, media: svgObtuseTriangle, exp: "Even if the height falls outside, Area = 0.5 × Base × Height. Base = 4 (from 2 to 6) and Height = 5. So, 0.5 × 4 × 5 = 10." }
+            ]
+        },
+        he: {
+            dir: "rtl", mainTitle: "ציר ה-X וציר ה-Y", whyNeedTitle: "למה אנחנו צריכים את זה?",
+            whyNeedContent: "צירי ה-X וה-Y יוצרים מערכת צירים המאפשרת לנו לאתר במדויק כל מיקום על משטח ישר באמצעות שני מספרים בלבד.",
+            quadrantsTitle: "הבנת ארבעת הרבעים",
+            quads: [
+                { num: "רביע שני (Q2)", desc: "X שלילי / Y חיובי" },
+                { num: "רביע ראשון (Q1)", desc: "הכל חיובי" },
+                { num: "רביע שלישי (Q3)", desc: "ערבוב של שליליים" },
+                { num: "רביע רביעי (Q4)", desc: "X חיובי / Y שלילי" }
+            ],
+            whyLearnTitle: "למה אנחנו לומדים את זה?", whyLearnContent: "למידת מערכת הצירים היא הבסיס לאלגברה, גיאומטריה ומפות.",
+            historyTitle: "קצת היסטוריה", historyContent: "הומצא על ידי רנה דקארט במאה ה-17.",
+            quizTitle: "בחן את עצמך (20 שאלות)", score: "ניקוד", checkBtn: "בדוק תשובה",
+            correct: "נכון מאוד! 🎉", wrong: "לא נכון. ❌",
+            questions: [
+                { q: "1. איזה ציר הוא אופקי?", o: ["ציר X", "ציר Y"], a: 0, exp: "ציר ה-X עובר בצורה אופקית משמאל לימין." },
+                { q: "2. איזה ציר הוא אנכי?", o: ["ציר X", "ציר Y"], a: 1, exp: "ציר ה-Y עולה ויורד בצורה אנכית ישרה." },
+                { q: "3. איך נקראת נקודת המפגש (0,0)?", o: ["מרכז", "ראשית הצירים"], a: 1, exp: "נקודת ההתחלה שבה הצירים חוצים זה את זה נקראת 'ראשית הצירים'." },
+                { q: "4. מי המציא את המערכת הזו?", o: ["אייזק ניוטון", "רנה דקארט"], a: 1, exp: "רנה דקארט המציא מערכת זו, ולכן היא נקראת מערכת קרטזית." },
+                { q: "5. בנקודה (3, 5), מהו ערך ה-X?", o: ["3", "5"], a: 0, exp: "בזוג סדור, ערך ה-X מופיע תמיד ראשון: (X, Y)." },
+                { q: "6. בנקודה (4, 7), מהו ערך ה-Y?", o: ["4", "7"], a: 1, exp: "בזוג סדור, ערך ה-Y מופיע תמיד שני: (X, Y)." },
+                { q: "7. תנועה ימינה בציר ה-X פירושה שהערכים הופכים ל...", o: ["חיוביים", "שליליים"], a: 0, exp: "צד ימין של ראשית הצירים מייצג ערכי X חיוביים הולכים וגדלים." },
+                { q: "8. תנועה למטה בציר ה-Y פירושה שהערכים הופכים ל...", o: ["חיוביים", "שליליים"], a: 1, exp: "מתחת לראשית הצירים נמצאים ערכי Y שליליים." },
+                { q: "9. כמה רבעים יש ברשת צירים סטנדרטית?", o: ["2", "4"], a: 1, exp: "שני הצירים החותכים זה את זה מחלקים את המישור ל-4 רבעים." },
+                { q: "10. ברביע הראשון, גם X וגם Y הם...", o: ["חיוביים", "שליליים"], a: 0, exp: "הרביע הראשון הוא הריבוע הימני העליון, שבו שני הערכים חיוביים." },
+                { q: "11. היכן ממוקמת הנקודה (-3, 0)?", o: ["על ציר ה-X", "על ציר ה-Y"], a: 0, exp: "מכיוון שערך ה-Y הוא 0, הנקודה נמצאת בדיוק על קו ציר ה-X." },
+                { q: "12. היכן ממוקמת הנקודה (0, 5)?", o: ["על ציר ה-X", "על ציר ה-Y"], a: 1, exp: "מכיוון שערך ה-X הוא 0, הנקודה נמצאת בדיוק על קו ציר ה-Y." },
+                { q: "13. מהו שם נוסף לקואורדינטת X?", o: ["אבציסה", "אורדינטה"], a: 0, exp: "אבציסה הוא המונח המתמטי הרשמי לקואורדינטת ה-X." },
+                { q: "14. מהו שם נוסף לקואורדינטת Y?", o: ["אבציסה", "אורדינטה"], a: 1, exp: "אורדינטה הוא המונח המתמטי הרשמי לקואורדינטת ה-Y." },
+                { q: "15. איזה ציר מופיע ראשון בזוג סדור?", o: ["X", "Y"], a: 0, exp: "לפי המוסכמה האוניברסלית, ה-X נכתב תמיד ראשון: (X,Y)." },
+                { q: "16. ברביע השלישי, מה מצב הסימנים של הצירים?", o: ["חיוביים", "שילוב של X שליلي ו-Y שלילי (-,-)"], a: 1, exp: "הרביע השלישי מייצג את האזור השמאלי התחתון שבו גם X וגם Y שליליים." },
+                { q: "17. איזו טכנולוגיה מסתמכת רבות על מערכת צירים?", o: ["ניווט GPS", "רמקולים לשמע"], a: 0, exp: "מערכות GPS פועלות על רשת של קווי אורך ורוחב שהם למעשה קואורדינטות." },
+                { q: "18. באיזו זווית נפגשים צירי ה-X וה-Y?", o: ["45 מעלות", "90 מעלות"], a: 1, exp: "הצירים מאונכים לחלוטין זה לזה ויוצרים זווית ישרה של 90 מעלות." },
+                { q: "19. חשב את שטח משולש ישר הזווית המוצג למטה.", o: ["6 יחידות שטח", "12 יחידות שטח"], a: 0, media: svgRightTriangle, exp: "שטח = 0.5 × בסיס × גובה. כאן הבסיס הוא 4 (מ-0 עד 4) והגובה הוא 3 (מ-0 עד 3). לכן: 0.5 × 4 × 3 = 6." },
+                { q: "20. חשב את שטח המשולש קהה הזווית שבו הגובה נמצא מחוץ למשולש.", o: ["10 יחידות שטח", "20 יחידות שטח"], a: 0, media: svgObtuseTriangle, exp: "גם כשהגובה נופל בחוץ, הנוסחה זהה: שטח = 0.5 × בסיס × גובה. הבסיס הוא 4 (מ-2 עד 6) והגובה הוא 5. לכן: 0.5 × 4 × 5 = 10." }
+            ]
+        },
+        ar: {
+            dir: "rtl", mainTitle: "محورا X و Y", whyNeedTitle: "لماذا نحتاج إليه؟",
+            whyNeedContent: "ينشئ محورا X و Y نظام إحداثيات يسمح لنا بتحديد أي موقع بدقة على سطح مستوٍ باستخدام رقمين فقط.",
+            quadrantsTitle: "فهم الأرباع الأربعة",
+            quads: [
+                { num: "الربع الثاني (Q2)", desc: "X سالب / Y موجب" },
+                { num: "الربع الأول (Q1)", desc: "كلاهما موجب" },
+                { num: "الربع الثالث (Q3)", desc: "خليط سالب بالكامل" },
+                { num: "الربع الرابع (Q4)", desc: "X موجب / Y سالب" }
+            ],
+            whyLearnTitle: "لماذا نتعلمه؟", whyLearnContent: "تعلم الإحداثيات هو الأساس للجبر والهندسة والخرائط.",
+            historyTitle: "لمحة تاريخية", historyContent: "اخترعه رينيه ديكارت في القرن السابع عشر.",
+            quizTitle: "اختبر معلوماتك (20 سؤال)", score: "النتيجة", checkBtn: "تحقق من الإجابة",
+            correct: "إجابة صحيحة! 🎉", wrong: "إجابة خاطئة. ❌",
+            questions: [
+                { q: "1. أي محور هو الأفقي؟", o: ["محور X", "محور Y"], a: 0, exp: "يمتد محور X أفقيًا عبر الشاشة من اليسار إلى اليمين." },
+                { q: "2. أي محور هو العمودي؟", o: ["محور X", "محور Y"], a: 1, exp: "يمتد محور Y عموديًا بشكل مستقيم لأعلى ولأسفل." },
+                { q: "3. ماذا تسمى نقطة التقاطع (0,0)؟", o: ["المركز", "نقطة الأصل"], a: 1, exp: "نقطة البداية التي يتقاطع فيها المحوران تُعرف باسم 'نقطة الأصل'." },
+                { q: "4. من اخترع هذا النظام؟", o: ["إسحاق نيوتن", "رينيه ديكارت"], a: 1, exp: "ابتكر رينيه ديكارت هذا النظام، ولهذا السبب يُطلق عليه النظام 'الديكارتي'." },
+                { q: "5. في الإحداثي (3, 5)، ما هي قيمة X؟", o: ["3", "5"], a: 0, exp: "الزوج المرتب يكتب دائمًا قيمة X أولاً: (X, Y)." },
+                { q: "6. في الإحداثي (4, 7)، ما هي قيمة Y؟", o: ["4", "7"], a: 1, exp: "الزوج المرتب يكتب دائمًا قيمة Y ثانياً: (X, Y)." },
+                { q: "7. التحرك يمينًا على محور X يعني أن القيم تصبح...", o: ["موجبة", "سالبة"], a: 0, exp: "يمين نقطة الأصل يمثل قيم X الموجبة المتزايدة." },
+                { q: "8. التحرك لأسفل على محور Y يعني أن القيم تصبح...", o: ["موجبة", "سالبة"], a: 1, exp: "أسفل نقطة الأصل يمثل قيم Y السالبة المتناقصة." },
+                { q: "9. كم ربعًا يوجد في الشبكة القياسية؟", o: ["2", "4"], a: 1, exp: "المحوران المتقاطعان يقسمان المستوي إلى أربعة أرباع منفصلة." },
+                { q: "10. في الربع الأول، تكون قيم X و Y...", o: ["موجبة", "سالبة"], a: 0, exp: "الربع الأول هو المربع العلوي الأيمن، وتكون فيه كلتا القيمتين موجبتين." },
+                { q: "11. أين تقع النقطة (-3, 0)؟", o: ["على محور X", "على محور Y"], a: 0, exp: "بما أن قيمة Y هي 0، فإن النقطة تقع تمامًا على خط محور X الأفقي." },
+                { q: "12. أين تقع النقطة (0, 5)؟", o: ["على محور X", "على محور Y"], a: 1, exp: "بما أن قيمة X هي 0، فإن النقطة تقع تمامًا على خط محور Y العمودي." },
+                { q: "13. ما هو الاسم الآخر لإحداثي X؟", o: ["السينات", "الصادات"], a: 0, exp: "محور السينات (Abscissa) هو المصطلح الرياضي المستخدم للتعبير عن المسافة الأفقية X." },
+                { q: "14. ما هو الاسم الآخر لإحداثي Y؟", o: ["السينات", "الصادات"], a: 1, exp: "محور الصادات (Ordinate) هو المصطلح الرياضي المستخدم للتعبير عن المسافة العمودية Y." },
+                { q: "15. أي إحداثي يأتي أولاً في الزوج المرتب؟", o: ["X", "Y"], a: 0, exp: "وفقًا للقواعد الرياضية العالمية المتبعة، يتم كتابة X أولاً دائمًا: (X, Y)." },
+                { q: "16. في الربع الثالث، ما هي حالة الإشارات؟", o: ["موجبة", "مزيج من X سالب و Y سالب (-,-)"], a: 1, exp: "يحتوي الربع الثالث على قيم X الأفقية السالبة وقيم Y العمودية السالبة." },
+                { q: "17. ما هي التكنولوجيا التي تعتمد بقوة على الإحداثيات؟", o: ["خرائط GPS", "مكبرات الصوت"], a: 0, exp: "يعتمد نظام تحديد المواقع العالمي (GPS) على نقاط تقاطع خطوط الطول ودوائر العرض." },
+                { q: "18. ما هي الزاوية التي يلتقي عندها المحوران؟", o: ["45 درجة", "90 درجة"], a: 1, exp: "المحوران متعامدان تمامًا، مما يشكل زاوية قائمة قياسها 90 درجة." },
+                { q: "19. احسب مساحة المثلث قائم الزاوية الموضح أدناه.", o: ["6 وحدات مربعة", "12 وحدة مربعة"], a: 0, media: svgRightTriangle, exp: "المساحة = 0.5 × القاعدة × الارتفاع. هنا القاعدة = 4 (من 0 إلى 4) والارتفاع = 3 (من 0 إلى 3). إذن، 0.5 × 4 × 3 = 6." },
+                { q: "20. احسب مساحة المثلث منفرج الزاوية ذو الارتفاع الخارجي الموضح أدناه.", o: ["10 وحدات مربعة", "20 وحدة مربعة"], a: 0, media: svgObtuseTriangle, exp: "حتى لو كان الارتفاع خارج المثلث، المساحة = 0.5 × القاعدة × الارتفاع. القاعدة = 4 (من 2 إلى 6) والارتفاع = 5. إذن، 0.5 × 4 × 5 = 10." }
+            ]
+        },
+        ru: {
+            dir: "ltr", mainTitle: "Оси X и Y", whyNeedTitle: "Зачем это нужно?",
+            whyNeedContent: "Оси X и Y создают систему координат, которая позволяет нам точно определить любое место на плоскости всего двумя числами.",
+            quadrantsTitle: "Понимание 4 Квадрантов",
+            quads: [
+                { num: "2-й Квадрант (Q2)", desc: "Минус X / Плюс Y" },
+                { num: "1-й Квадрант (Q1)", desc: "Все Плюсы" },
+                { num: "3-й Квадрант (Q3)", desc: "Смесь Минусов (-,-)" },
+                { num: "4-й Квадрант (Q4)", desc: "Плюс X / Минус Y" }
+            ],
+            whyLearnTitle: "Зачем мы это изучаем?", whyLearnContent: "Изучение координат — это основа алгебры, геометрии и карт.",
+            historyTitle: "Немного истории", historyContent: "Изобретено Рене Декартом в XVII веке.",
+            quizTitle: "Проверьте свои знания (20 вопросов)", score: "Счет", checkBtn: "Проверить ответ",
+            correct: "Правильно! 🎉", wrong: "Неправильно. ❌",
+            questions: [
+                { q: "1. Какая ось является горизонтальной?", o: ["Ось X", "Ось Y"], a: 0, exp: "Ось X проходит горизонтально по экрану слева направо." },
+                { q: "2. Какая ось является vertical?", o: ["Ось X", "Ось Y"], a: 1, exp: "Ось Y проходит вертикально прямо вверх и вниз." },
+                { q: "3. Как называется точка пересечения (0,0)?", o: ["Центр", "Начало координат"], a: 1, exp: "Начальная точка, где пересекаются оси, называется 'Началом координат'." },
+                { q: "4. Кто изобрел эту систему?", o: ["Исаак Ньютон", "Рене Декарт"], a: 1, exp: "Рене Декарт создал эту систему, поэтому её называют 'Декартовой'." },
+                { q: "5. В координате (3, 5) какое значение имеет X?", o: ["3", "5"], a: 0, exp: "В упорядоченной паре всегда первым указывается X: (X, Y)." },
+                { q: "6. В координате (4, 7) какое значение имеет Y?", o: ["4", "7"], a: 1, exp: "В упорядоченной паре всегда вторым указывается Y: (X, Y)." },
+                { q: "7. Движение вправо по оси X означает, что значения становятся...", o: ["Положительными", "Отрицательными"], a: 0, exp: "Справа от начала координат находятся возрастающие положительные значения X." },
+                { q: "8. Движение вниз по оси Y означает, что значения становятся...", o: ["Положительными", "Отрицательными"], a: 1, exp: "Ниже начала координат находятся убывающие отрицательные значения Y." },
+                { q: "9. Сколько квадрантов в стандартной сетке?", o: ["2", "4"], a: 1, exp: "Две пересекающиеся оси делят пространство на четыре отдельных квадранта." },
+                { q: "10. В 1-м квадранте и X, и Y являются...", o: ["Положительными", "Отрицательными"], a: 0, exp: "1-й квадрант — это верхний правый квадрат, где оба значения положительны." },
+                { q: "11. Где находится точка (-3, 0)?", o: ["На оси X", "На оси Y"], a: 0, exp: "Поскольку значение Y равно 0, точка лежит прямо на горизонтальной линии оси X." },
+                { q: "12. Где находится точка (0, 5)?", o: ["На оси X", "На оси Y"], a: 1, exp: "Поскольку значение X равно 0, точка лежит прямо на вертикальной линии оси Y." },
+                { q: "13. Как еще называют координату X?", o: ["Абсцисса", "Ордината"], a: 0, exp: "Абсцисса — это технический математический термин для обозначения расстояния по X." },
+                { q: "14. Как еще называют координату Y?", o: ["Абсцисса", "Ордината"], a: 1, exp: "Ордината — это технический математический термин для обозначения расстояния по Y." },
+                { q: "15. Какая координата идет первой в упорядоченной паре?", o: ["X", "Y"], a: 0, exp: "По общепринятым правилам, координата X всегда записывается первой: (X, Y)." },
+                { q: "16. Каковы знаки координат в 3-м Квадранте?", o: ["Положительные", "Смесь отрицательного X и отрицательного Y (-,-)"], a: 1, exp: "Третий квадрант содержит отрицательные горизонтальные значения X и отрицательные вертикальные значения Y." },
+                { q: "17. Какая технология сильно зависит от координат?", o: ["GPS-карты", "Аудиоколонки"], a: 0, exp: "GPS-навигация использует глобальные точки пересечения координат широты и долготы." },
+                { q: "18. Под каким углом пересекаются оси X и Y?", o: ["45 градусов", "90 градусов"], a: 1, exp: "Оси абсолютно перпендикулярны друг другу и образуют прямой угол в 90 градусов." },
+                { q: "19. Вычислите площадь прямоугольного треугольника, показанного ниже.", o: ["6 кв. единиц", "12 кв. единиц"], a: 0, media: svgRightTriangle, exp: "Площадь = 0.5 × Основание × Высоту. Основание = 4 (от 0 до 4), Высота = 3 (от 0 до 3). Итого: 0.5 × 4 × 3 = 6." },
+                { q: "20. Вычислите площадь тупоугольного треугольника с внешней высотой, показанного ниже.", o: ["10 кв. единиц", "20 кв. единиц"], a: 0, media: svgObtuseTriangle, exp: "Даже если высота падает снаружи, Формула та же: 0.5 × Основание × Высоту. Основание = 4 (от 2 до 6), Высота = 5. Итого: 0.5 × 4 × 5 = 10." }
+            ]
+        }
+    };
+
+    let currentLang = 'en';
+    let currentScore = 0;
+
+    function setLanguage(lang) {
+        currentLang = lang;
+        const data = translations[lang];
+        
+        document.documentElement.lang = lang;
+        document.documentElement.dir = data.dir;
+
+        document.getElementById('main-title').innerText = data.mainTitle;
+        document.getElementById('title-why-need').innerText = data.whyNeedTitle;
+        document.getElementById('content-why-need').innerText = data.whyNeedContent;
+        document.getElementById('title-why-learn').innerText = data.whyLearnTitle;
+        document.getElementById('content-why-learn').innerText = data.whyLearnContent;
+        document.getElementById('title-history').innerText = data.historyTitle;
+        document.getElementById('content-history').innerText = data.historyContent;
+        document.getElementById('title-quiz').innerText = data.quizTitle;
+        document.getElementById('title-quadrants').innerText = data.quadrantsTitle;
+        
+        const visualQuads = document.querySelectorAll('.quadrant');
+        visualQuads[0].querySelector('.quad-num').innerText = data.quads[0].num;
+        visualQuads[0].querySelector('.quad-desc').innerText = data.quads[0].desc;
+
+        visualQuads[1].querySelector('.quad-num').innerText = data.quads[1].num;
+        visualQuads[1].querySelector('.quad-desc').innerText = data.quads[1].desc;
+
+        visualQuads[2].querySelector('.quad-num').innerText = data.quads[2].num;
+        visualQuads[2].querySelector('.quad-desc').innerText = data.quads[2].desc;
+
+        visualQuads[3].querySelector('.quad-num').innerText = data.quads[3].num;
+        visualQuads[3].querySelector('.quad-desc').innerText = data.quads[3].desc;
+
+        currentScore = 0;
+        updateScoreBoard();
+        renderQuiz();
+    }
+
+    function updateScoreBoard() {
+        const data = translations[currentLang];
+        document.getElementById('score-text').innerText = `${data.score}: ${currentScore} / 20`;
+    }
+
+    function renderQuiz() {
+        const quizContainer = document.getElementById('quiz');
+        quizContainer.innerHTML = '';
+        const data = translations[currentLang];
+
+        data.questions.forEach((qObj, qIdx) => {
+            const card = document.createElement('div');
+            card.className = 'question-card';
+
+            const qTitle = document.createElement('p');
+            qTitle.style.fontWeight = 'bold';
+            qTitle.innerText = qObj.q;
+            card.appendChild(qTitle);
+
+            if (qObj.media) {
+                const mediaWrapper = document.createElement('div');
+                mediaWrapper.innerHTML = qObj.media;
+                card.appendChild(mediaWrapper);
+            }
+
+            const optionsDiv = document.createElement('div');
+            optionsDiv.className = 'options';
+
+            qObj.o.forEach((option, oIdx) => {
+                const label = document.createElement('label');
+                label.className = 'option-label';
+
+                const radio = document.createElement('input');
+                radio.type = 'radio';
+                radio.name = `q${qIdx}`;
+                radio.value = oIdx;
+                radio.style.marginInlineEnd = '10px';
+
+                label.appendChild(radio);
+                label.appendChild(document.createTextNode(option));
+                optionsDiv.appendChild(label);
+            });
+
+            card.appendChild(optionsDiv);
+
+            const checkBtn = document.createElement('button');
+            checkBtn.className = 'btn-check';
+            checkBtn.innerText = data.checkBtn;
+            checkBtn.onclick = () => checkAnswer(qIdx, qObj.a, checkBtn, card);
+            card.appendChild(checkBtn);
+
+            const feedback = document.createElement('div');
+            feedback.className = 'feedback';
+            feedback.style.display = 'none';
+            feedback.id = `feedback-${qIdx}`;
+            card.appendChild(feedback);
+
+            quizContainer.appendChild(card);
+        });
+    }
+
+    function checkAnswer(qIdx, correctIdx, btn, card) {
+        const selected = card.querySelector(`input[name="q${qIdx}"]:checked`);
+        const feedbackDiv = document.getElementById(`feedback-${qIdx}`);
+        const data = translations[currentLang];
+
+        if (!selected) return; 
+
+        card.querySelectorAll(`input[name="q${qIdx}"]`).forEach(input => input.disabled = true);
+        btn.disabled = true;
+
+        const questionData = data.questions[qIdx];
+        feedbackDiv.style.display = 'block';
+
+        if (parseInt(selected.value) === correctIdx) {
+            currentScore++;
+            feedbackDiv.className = 'feedback correct';
+            feedbackDiv.innerHTML = `<div>${data.correct}</div><div class="explanation">${questionData.exp}</div>`;
+        } else {
+            feedbackDiv.className = 'feedback wrong';
+            feedbackDiv.innerHTML = `<div>${data.wrong}</div><div class="explanation">${questionData.exp}</div>`;
+        }
+
+        updateScoreBoard();
+    }
+
+    window.onload = () => {
+        setLanguage('en');
+    };
+</script>
+
+</body>
+</html>
